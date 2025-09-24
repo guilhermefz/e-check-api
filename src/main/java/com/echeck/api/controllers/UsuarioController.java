@@ -11,11 +11,28 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 
 @RestController
-@RequestMapping("/pergunta")
-public class PerguntaController {
+@RequestMapping("/usuario")
+public class UsuarioController {
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
+
 
     @GetMapping("/hello")
     public String helloWorld() {
         return "Olá, mundo!";
+    }
+
+    @PostMapping("/salvar")
+    public ResponseEntity<?> salvar(
+            @RequestBody @Validated UsuarioDto dto
+    ) {
+
+        Usuario userModel = usuarioService.create(dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                userModel);
     }
 }

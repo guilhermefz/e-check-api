@@ -1,12 +1,12 @@
-package model;
+package com.echeck.api.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import model.enums.TipoUsuario;
+import com.echeck.api.model.enums.TipoUsuario;
 
-@Entity
+@Entity(name = "usuario")
 @Table(name = "usuario")
 @Data
 @NoArgsConstructor
@@ -14,6 +14,7 @@ import model.enums.TipoUsuario;
 public class Usuario {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
     private String email;

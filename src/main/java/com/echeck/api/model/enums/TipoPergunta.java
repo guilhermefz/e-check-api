@@ -1,4 +1,4 @@
-package model.enums;
+package com.echeck.api.model.enums;
 
 public enum TipoPergunta {
     TEXTO_ABERTO,

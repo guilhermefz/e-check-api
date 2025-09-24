@@ -1,10 +1,12 @@
-package model;
+package com.echeck.api.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
+import java.util.List;
+
+@Entity(name = "unidade")
 @Table(name = "unidade")
 @Data
 @NoArgsConstructor
@@ -22,4 +24,7 @@ public class Unidade {
     private String bairro;
     private String rua;
     private String numero;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_unidade")
+    private List<Formulario> formularios;
 }

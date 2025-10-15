@@ -8,11 +8,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-public interface UsuarioRepository extends JpaRepository<Usuario, Id> {
+public interface UsuarioRepository extends JpaRepository<Usuario, UUID>, Serializable {
     void deleteById(SingularAttribute<AbstractPersistable, Serializable> id);
 
     List<Usuario> findByNomeContainingIgnoreCase(String nome);
+
+    Optional<Usuario> findById(long id);
 }
 
 

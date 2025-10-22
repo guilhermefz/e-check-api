@@ -1,0 +1,10 @@
+spring.datasource.url=jdbc:postgresql://localhost/echeck-db
+spring.datasource.username=postgres
+spring.datasource.password=SENHA_LOCAL_AQUI
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+springdoc.swagger-ui.path=/swagger/public
+springdoc.api-docs.path=/v3/api-docs
+springdoc.api-docs.enabled=true

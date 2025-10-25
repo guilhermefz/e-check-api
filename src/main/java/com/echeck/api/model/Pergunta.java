@@ -1,5 +1,6 @@
 package com.echeck.api.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,9 +22,12 @@ public class Pergunta {
     @Column(name = "tipo")
     @Enumerated(EnumType.STRING)
     private TipoPergunta tipo;
+
     @ManyToOne
     @JoinColumn(name = "id_formulario")
+    @JsonBackReference
     private Formulario formulario;
+
     @OneToMany(mappedBy = "pergunta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OpcaoResposta> opcoesRespostas;
 }

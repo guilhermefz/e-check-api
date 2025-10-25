@@ -10,7 +10,9 @@ import java.io.Serializable;
 import java.util.List;
 
 @Repository
-public interface PerguntaRepository extends JpaRepository<Pergunta, Long>
-{
+public interface PerguntaRepository extends JpaRepository<Pergunta, Long> {
+
     List<Pergunta> findByDescricaoContainingIgnoreCase(String descricao);
+
+    List<Pergunta> findByFormularioId(Long formularioId);
 }

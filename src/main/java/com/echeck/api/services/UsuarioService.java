@@ -6,6 +6,7 @@ import com.echeck.api.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -31,11 +32,15 @@ public class UsuarioService {
 
     public void delete(long id) {
         Usuario existente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("produto não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
         usuarioRepository.delete(existente);
     }
 
     public List<Usuario> buscarPorNome(String nomeBusca) {
         return usuarioRepository.findByNomeContainingIgnoreCase(nomeBusca);
+    }
+
+    public Optional<Usuario> buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email);
     }
 }

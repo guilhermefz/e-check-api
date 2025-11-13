@@ -17,7 +17,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>, Seriali
 
     Optional<Usuario> findById(long id);
 
-    Optional<Usuario> findByEmail (String email);
+    // MÉTODOS PARA AUTENTICAÇÃO E RECUPERAÇÃO <--- NOVOS
+    Optional<Usuario> findByEmail(String email);
+    Optional<Usuario> findByResetPasswordToken(String token);
 
 }
 

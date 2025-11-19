@@ -1,4 +1,4 @@
-package com.echeck.api.auth.service; // Pacote ajustado para o diretório "auth/service" do seu print
+package com.echeck.api.services;
 
 import com.sendgrid.Method;
 import com.sendgrid.Request;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
-public class EmailService { // Nome da classe ajustado para o que está no seu print
+public class SendGridEmailService {
 
     @Value("${sendgrid.api-key}")
     private String sendGridApiKey;
@@ -44,14 +44,13 @@ public class EmailService { // Nome da classe ajustado para o que está no seu p
             } else {
                 System.err.println("Falha no envio via API. Status: " + response.getStatusCode());
                 System.err.println("Corpo da Resposta do SendGrid: " + response.getBody());
-                // Retorna 500 se o SendGrid falhar
-                throw new IOException("Falha no envio SendGrid: " + response.getBody());
+                return false;
             }
 
         } catch (IOException ex) {
             System.err.println("Erro de IO ao enviar e-mail: " + ex.getMessage());
-            // Lança exceção para ser capturada pelo Controller
-            throw new RuntimeException("Erro ao se comunicar com o SendGrid.", ex);
+            ex.printStackTrace();
+            return false;
         }
     }
 }

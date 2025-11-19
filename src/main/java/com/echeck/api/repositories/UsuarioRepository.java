@@ -19,8 +19,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>, Seriali
 
     // MÉTODOS PARA AUTENTICAÇÃO E RECUPERAÇÃO <--- NOVOS
     Optional<Usuario> findByEmail(String email);
-    Optional<Usuario> findByResetPasswordToken(String token);
-
+    Optional<Usuario> findByResetToken(String resetToken);
 }
 
 

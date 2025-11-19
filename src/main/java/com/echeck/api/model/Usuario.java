@@ -22,12 +22,12 @@ public class Usuario {
     private String senha;
     private TipoUsuario tipo;
 
-    // CAMPOS PARA RECUPERAÇÃO DE SENHA <--- NOVOS
-    @Column(name = "reset_password_token")
-    private String resetPasswordToken;
+//CAMPOS PARA RECUPERAÇÃO DE SENHA
+    @Column(name = "reset_token")
+    private String resetToken;
 
-    @Column(name = "reset_password_expires")
-    private Instant resetPasswordExpires; // Para rastrear a validade do token
+    @Column(name = "token_expiration")
+    private Instant tokenExpiration;
 
     public Usuario(String nome, String email, String senha, TipoUsuario tipo) {
         this.nome = nome;

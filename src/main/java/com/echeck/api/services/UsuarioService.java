@@ -10,10 +10,17 @@ import java.util.Optional;
 
 @Service
 public class UsuarioService {
-    private final UsuarioRepository usuarioRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    // ATRIBUTOS
+    private final UsuarioRepository usuarioRepository;
+    // Embora o AuthService use o SendGrid, vamos injetar aqui para manter o construtor
+    // sincronizado com o que você havia tentado, mas ele não será usado nesta classe.
+    private final SendGridEmailService emailService;
+
+    // CONSTRUTOR UNIFICADO (Injeção de Dependência)
+    public UsuarioService(UsuarioRepository usuarioRepository, SendGridEmailService emailService) {
         this.usuarioRepository = usuarioRepository;
+        this.emailService = emailService;
     }
 
 
@@ -40,6 +47,7 @@ public class UsuarioService {
         return usuarioRepository.findByNomeContainingIgnoreCase(nomeBusca);
     }
 
+    // MÉTODO ESSENCIAL: Permite que outras classes busquem o usuário pelo e-mail
     public Optional<Usuario> buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
     }

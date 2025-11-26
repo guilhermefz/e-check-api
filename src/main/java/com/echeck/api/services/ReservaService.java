@@ -1,7 +1,9 @@
 package com.echeck.api.services;
 
 import com.echeck.api.Dtos.ReservaDto;
+import com.echeck.api.model.Formulario;
 import com.echeck.api.model.Reserva;
+import com.echeck.api.repositories.FormularioRepository;
 import com.echeck.api.repositories.ReservaRepository;
 import com.echeck.api.repositories.UnidadeRepository;
 import jakarta.transaction.Transactional;
@@ -9,15 +11,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final UnidadeRepository unidadeRepository;
+    private final FormularioRepository formularioRepository;
 
-    public ReservaService(ReservaRepository reservaRepository, UnidadeRepository unidadeRepository){
+    public ReservaService(ReservaRepository reservaRepository, UnidadeRepository unidadeRepository, FormularioRepository formularioRepository){
         this.reservaRepository = reservaRepository;
         this.unidadeRepository = unidadeRepository;
+        this.formularioRepository = formularioRepository;
     }
 
     @Transactional
@@ -32,6 +37,19 @@ public class ReservaService {
         }
 
         Reserva reserva = new Reserva();
+        reserva.setToken(UUID.randomUUID().toString());
+
+        List<Formulario> formularios = formularioRepository.findByUnidadeId(dto.getUnidadeId());
+        Formulario formularioAtivo = formularios.stream()
+                .filter(f -> Boolean.TRUE.equals(f.getStatus()))
+                .findFirst()
+                .orElse(null);
+
+        if (formularioAtivo != null) {
+            reserva.setFormulario(formularioAtivo);
+        } else {
+            System.out.println("AVISO: Nenhum formulário ativo encontrado para a unidade " + dto.getUnidadeId());
+        }
 
         reserva.setUnidade(dto.getUnidadeId());
         reserva.setCpf(dto.getCpf());
@@ -86,6 +104,10 @@ public class ReservaService {
         }
 
         reservaRepository.deleteById(id);
+    }
+
+    public Optional<Reserva> findByToken(String token) {
+        return reservaRepository.findByToken(token);
     }
 }
 

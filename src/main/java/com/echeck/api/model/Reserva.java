@@ -1,5 +1,6 @@
 package com.echeck.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,4 +28,10 @@ public class Reserva {
     private LocalDate dataCheckin;
     private LocalDate dataCheckout;
     private StatusReserva status;
+
+    private String token;
+    @ManyToOne
+    @JoinColumn(name = "id_formulario")
+    @JsonIgnoreProperties("perguntas")
+    private Formulario formulario;
 }

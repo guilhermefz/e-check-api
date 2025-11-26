@@ -66,4 +66,11 @@ public class ReservaController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @GetMapping("/validar/{token}")
+    public ResponseEntity<Reserva> buscarPorToken(@PathVariable String token) {
+        Optional<Reserva> reserva = reservaService.findByToken(token);
+
+        return reserva.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
 }

@@ -67,4 +67,10 @@ public class FormularioController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @GetMapping("/unidade/{unidadeId}")
+    public ResponseEntity<List<Formulario>> buscarPorUnidade(@PathVariable Long unidadeId) {
+        List<Formulario> formularios = formularioService.buscarPorUnidadeId(unidadeId);
+        return ResponseEntity.ok(formularios);
+    }
 }

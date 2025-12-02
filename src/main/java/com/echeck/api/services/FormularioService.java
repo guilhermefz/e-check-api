@@ -71,4 +71,8 @@ public class FormularioService {
         formularioRepository.delete(formularioExistente);
     }
 
+    public List<Formulario> buscarPorUnidadeId(Long unidadeId) {
+        return formularioRepository.findByUnidadeId(unidadeId);
+    }
+
 }

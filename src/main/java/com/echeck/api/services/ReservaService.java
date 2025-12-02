@@ -38,15 +38,21 @@ public class ReservaService {
 
         Reserva reserva = new Reserva();
         reserva.setToken(UUID.randomUUID().toString());
+        Formulario formularioEscolhido = null;
 
-        List<Formulario> formularios = formularioRepository.findByUnidadeId(dto.getUnidadeId());
-        Formulario formularioAtivo = formularios.stream()
-                .filter(f -> Boolean.TRUE.equals(f.getStatus()))
-                .findFirst()
-                .orElse(null);
+        if (dto.getFormularioId() != null) {
+            formularioEscolhido = formularioRepository.findById(dto.getFormularioId())
+                    .orElseThrow(() -> new RuntimeException("Formulário informado não encontrado! ID: " + dto.getFormularioId()));
+        }else {
+            List<Formulario> formularios = formularioRepository.findByUnidadeId(dto.getUnidadeId());
+            formularioEscolhido = formularios.stream()
+                    .filter(f -> Boolean.TRUE.equals(f.getStatus()))
+                    .findFirst()
+                    .orElse(null);
+        }
 
-        if (formularioAtivo != null) {
-            reserva.setFormulario(formularioAtivo);
+        if (formularioEscolhido != null) {
+            reserva.setFormulario(formularioEscolhido);
         } else {
             System.out.println("AVISO: Nenhum formulário ativo encontrado para a unidade " + dto.getUnidadeId());
         }

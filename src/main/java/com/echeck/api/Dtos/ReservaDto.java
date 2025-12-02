@@ -9,6 +9,7 @@ import java.time.LocalDate;
 public class ReservaDto {
 
     private Long unidadeId;
+    private Long formularioId;
     private String cpf;
     private String cnpj;
     private String telefone;

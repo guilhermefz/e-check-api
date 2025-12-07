@@ -9,9 +9,9 @@
         <relativePath/> </parent>
     <groupId>com.echeck</groupId>
     <artifactId>api</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>api</name>
-    <description>API para o sistema de avaliação E-Check</description>
+    <description>API para o site de avaliacao ECheck</description>
     <url/>
     <licenses>
         <license/>

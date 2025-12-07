@@ -4,6 +4,7 @@ import com.echeck.api.Dtos.UsuarioDto;
 import com.echeck.api.model.Usuario;
 import com.echeck.api.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,23 @@ public class UsuarioService {
         usuario.setTipo(dto.getTipo());
         usuario.setSenha(dto.getSenha());
         return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public Usuario update(Long id, UsuarioDto dto) {
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+
+        usuarioExistente.setNome(dto.getNome());
+        usuarioExistente.setEmail(dto.getEmail());
+        usuarioExistente.setTipo(dto.getTipo());
+
+        // Só atualiza a senha se foi fornecida uma nova
+        if(dto.getSenha() != null && !dto.getSenha().isEmpty()) {
+            usuarioExistente.setSenha(dto.getSenha());
+        }
+
+        return usuarioRepository.save(usuarioExistente);
     }
 
     public List<Usuario> listar() {

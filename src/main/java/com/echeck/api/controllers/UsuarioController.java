@@ -58,6 +58,17 @@ public class UsuarioController {
 
     }
 
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody UsuarioDto usuarioDto) {
+        try {
+            Usuario usuarioAtualizado = usuarioService.update(id, usuarioDto);
+            return ResponseEntity.ok(usuarioAtualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao atualizar usuário: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/buscar/{nome}")
     public List<Usuario> buscar(@RequestParam String nomeBusca) {
         return usuarioService.buscarPorNome(nomeBusca);

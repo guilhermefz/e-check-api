@@ -8,13 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @CrossOrigin(origins = "*")
-
 @RestController
 @RequestMapping("/usuario")
 public class UsuarioController {
@@ -76,22 +76,27 @@ public class UsuarioController {
 
     @PostMapping("/login")
     public ResponseEntity<?> autenticarUsuario(@RequestBody LoginRequestDto loginDto) {
-
         Optional<Usuario> usuarioOpt = usuarioService.buscarPorEmail(loginDto.getEmail());
+
+        // Objeto para garantir que a resposta de erro seja JSON
+        Map<String, String> errorResponse = new HashMap<>();
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
 
             if (usuario.getSenha().equals(loginDto.getSenha())) {
-
+                // Caminho de Sucesso (200 OK - Retorna JSON)
                 usuario.setSenha(null);
                 return ResponseEntity.ok(usuario);
-
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha inválida");
+                // CORREÇÃO: Envolve a mensagem em um objeto JSON
+                errorResponse.put("message", "Senha inválida");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado");
+            // CORREÇÃO: Envolve a mensagem em um objeto JSON
+            errorResponse.put("message", "Usuário não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
     }
 }

@@ -18,26 +18,43 @@ public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final UnidadeRepository unidadeRepository;
     private final FormularioRepository formularioRepository;
+    private final SendGridEmailService emailService; // 1. NOVO: Dependência de Email
 
-    public ReservaService(ReservaRepository reservaRepository, UnidadeRepository unidadeRepository, FormularioRepository formularioRepository){
+    // 2. Construtor com Injeção de Dependência
+    public ReservaService(ReservaRepository reservaRepository, UnidadeRepository unidadeRepository,
+                          FormularioRepository formularioRepository, SendGridEmailService emailService){
         this.reservaRepository = reservaRepository;
         this.unidadeRepository = unidadeRepository;
         this.formularioRepository = formularioRepository;
+        this.emailService = emailService; // Injeção correta
     }
 
     @Transactional
     public Reserva create(ReservaDto dto) {
 
+        // 3. Validações
         if (dto.getUnidadeId() == null) {
             throw new IllegalArgumentException("O ID da Unidade é obrigatório para criar a reserva.");
         }
-
         if (!unidadeRepository.existsById(dto.getUnidadeId())) {
             throw new RuntimeException("Unidade não encontrada! ID: " + dto.getUnidadeId());
         }
 
         Reserva reserva = new Reserva();
         reserva.setToken(UUID.randomUUID().toString());
+
+        // 4. Mapeamento de Campos (NOVA POSIÇÃO: início do método)
+        reserva.setUnidade(dto.getUnidadeId());
+        reserva.setCpf(dto.getCpf());
+        reserva.setCnpj(dto.getCnpj());
+        reserva.setTelefone(dto.getTelefone());
+        reserva.setEmail(dto.getEmail());
+        reserva.setDataCheckin(dto.getDataCheckin());
+        reserva.setDataCheckout(dto.getDataCheckout());
+        reserva.setStatus(dto.getStatus());
+
+
+        // 5. Lógica de Encontrar Formulário (EXISTENTE)
         Formulario formularioEscolhido = null;
 
         if (dto.getFormularioId() != null) {
@@ -57,17 +74,36 @@ public class ReservaService {
             System.out.println("AVISO: Nenhum formulário ativo encontrado para a unidade " + dto.getUnidadeId());
         }
 
-        reserva.setUnidade(dto.getUnidadeId());
-        reserva.setCpf(dto.getCpf());
-        reserva.setCnpj(dto.getCnpj());
-        reserva.setTelefone(dto.getTelefone());
-        reserva.setEmail(dto.getEmail());
-        reserva.setDataCheckin(dto.getDataCheckin());
-        reserva.setDataCheckout(dto.getDataCheckout());
-        reserva.setStatus(dto.getStatus());
+        // 6. Salvar a Reserva
+        Reserva reservaSalva = reservaRepository.save(reserva);
 
-        return reservaRepository.save(reserva);
+        // 7. NOVO: Enviar Email (Se houver email e formulário)
+        if (reservaSalva.getEmail() != null && !reservaSalva.getEmail().isEmpty() && reservaSalva.getFormulario() != null) {
+            enviarEmailFormulario(reservaSalva);
+        }
+
+        return reservaSalva;
     }
+
+    // 8. NOVO: Método privado para envio de email
+    private void enviarEmailFormulario(Reserva reserva) {
+        // URL FIXA: Use o endereço do seu Frontend na AWS
+        final String FRONTEND_BASE_URL = "http://44.201.180.209";
+
+        String linkFormulario = FRONTEND_BASE_URL + "/responder-form/" + reserva.getToken();
+
+        String assunto = "Sua Avaliação de Satisfação E-Check";
+        String corpoEmail = "<h2>Olá!</h2><p>Por favor, complete a sua avaliação de satisfação clicando no link abaixo:</p>" +
+                "<p><a href=\"" + linkFormulario + "\">Responder Formulário de Avaliação</a></p>" +
+                "<p>Obrigado!</p>";
+
+        try {
+            emailService.sendEmail(reserva.getEmail(), assunto, corpoEmail);
+        } catch (Exception e) {
+            System.err.println("ERRO: Falha ao enviar e-mail para " + reserva.getEmail() + ": " + e.getMessage());
+        }
+    }
+
 
     public List<Reserva> findAll() {
         return reservaRepository.findAll();
@@ -115,5 +151,30 @@ public class ReservaService {
     public Optional<Reserva> findByToken(String token) {
         return reservaRepository.findByToken(token);
     }
-}
 
+    public void enviarEmailReserva(Long reservaId, String emailDestino, String linkCompleto) {
+
+        // 1. Validação/Busca da Reserva (para garantir que o ID é válido)
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada para o ID fornecido: " + reservaId));
+
+        // 2. Montar o Email com o link e email fornecidos pelo Front
+        String assunto = "Reenvio de Formulário de Satisfação (Reserva ID: " + reservaId + ")";
+
+        // O corpo usa o link já montado pelo Front
+        String corpoEmail = "<h2>Olá!</h2>" +
+                "<p>Estamos reenviando o link de avaliação da sua reserva (ID: " + reservaId + ").</p>" +
+                "<p>Por favor, clique no link abaixo:</p>" +
+                "<p><a href=\"" + linkCompleto + "\">Responder Formulário de Avaliação</a></p>" +
+                "<p>Obrigado!</p>";
+
+        // 3. Enviar
+        try {
+            emailService.sendEmail(emailDestino, assunto, corpoEmail); // Usa o email de destino
+        } catch (Exception e) {
+            System.err.println("ERRO: Falha ao enviar e-mail para " + emailDestino + " para a reserva " + reservaId + ": " + e.getMessage());
+            throw new RuntimeException("Falha na comunicação com o serviço de email. Verifique a chave SendGrid e tente novamente.");
+        }
+    }
+
+}

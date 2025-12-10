@@ -1,5 +1,6 @@
 package com.echeck.api.controllers;
 
+import com.echeck.api.Dtos.EnviarEmailRequestDto;
 import com.echeck.api.Dtos.ReservaDto;
 import com.echeck.api.model.Reserva;
 import com.echeck.api.services.ReservaService;
@@ -72,5 +73,24 @@ public class ReservaController {
         Optional<Reserva> reserva = reservaService.findByToken(token);
 
         return reserva.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @PostMapping("/enviar-email")
+    public ResponseEntity<String> enviarEmail(@RequestBody EnviarEmailRequestDto dto) {
+        try {
+            // Validações básicas (os campos são obrigatórios pelo front)
+            if (dto.getReservaId() == null || dto.getEmail() == null || dto.getLink() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dados de envio incompletos.");
+            }
+
+            // Chama o serviço para enviar
+            reservaService.enviarEmailReserva(dto.getReservaId(), dto.getEmail(), dto.getLink());
+
+            return ResponseEntity.ok("E-mail enviado com sucesso!");
+
+        } catch (RuntimeException e) {
+            // Captura erros como Reserva não encontrada ou falha de SendGrid
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }
